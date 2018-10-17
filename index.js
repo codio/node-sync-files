@@ -21,6 +21,18 @@ module.exports = function (source, target, opts, notify) {
   opts.mainSourcePath = source;
   opts.mainTargetPath = target;
 
+  opts.excludeMap = {};
+  opts.exclude.forEach(item => {
+    opts.excludeMap[item] = true;
+  });
+
+  if (typeof opts.exclude === "string") {
+    opts.exclude = [opts.exclude];
+  }
+
+  opts.mainSourcePath = source;
+  opts.mainTargetPath = target;
+
   opts.ig = ignore().filter(opts.exclude);
 
   if (typeof opts.depth !== "number" || isNaN(opts.depth)) {
