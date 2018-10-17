@@ -1,6 +1,7 @@
 "use strict";
 
 var defaults = require("lodash").defaults;
+var isEmpty = require("lodash").isEmpty;
 var fs = require("fs-extra");
 var path = require("path");
 var chokidar = require("chokidar");
@@ -21,19 +22,7 @@ module.exports = function (source, target, opts, notify) {
   opts.mainSourcePath = source;
   opts.mainTargetPath = target;
 
-  opts.excludeMap = {};
-  opts.exclude.forEach(item => {
-    opts.excludeMap[item] = true;
-  });
-
-  if (typeof opts.exclude === "string") {
-    opts.exclude = [opts.exclude];
-  }
-
-  opts.mainSourcePath = source;
-  opts.mainTargetPath = target;
-
-  opts.ig = ignore().filter(opts.exclude);
+  opts.ig = ignore().add(opts.exclude);
 
   if (typeof opts.depth !== "number" || isNaN(opts.depth)) {
     notify("error", "Expected valid number for option 'depth'");
@@ -184,7 +173,7 @@ function destroy (fileordir, notify) {
 
 function checkSourceIgnored(source, opts, notify) {
   var relativeSourcePath = source.replace(opts.mainSourcePath, "").replace(/^[\///]/, "");
-  if (opts.ig.ignores(relativeSourcePath)) {
+  if (!isEmpty(relativeSourcePath) && opts.ig.ignores(relativeSourcePath)) {
     notify("exclude-source", source);
     return true;
   }
@@ -192,7 +181,7 @@ function checkSourceIgnored(source, opts, notify) {
 
 function checkTargetIgnored(target, opts, notify) {
   var relativeTargetPath = target.replace(opts.mainTargetPath, "").replace(/^[\///]/, "");
-  if (opts.ig.ignores(relativeTargetPath)) {
+  if (!isEmpty(relativeTargetPath) && opts.ig.ignores(relativeTargetPath)) {
     notify("exclude-target", target);
     return true;
   }
