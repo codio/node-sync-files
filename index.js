@@ -7,6 +7,8 @@ var path = require("path");
 var chokidar = require("chokidar");
 var ignore = require("ignore");
 
+var LEADING_SLASH_REGEXP = /^[/\\]/;
+
 module.exports = function (source, target, opts, notify) {
   opts = defaults(opts || {}, {
     "watch": false,
@@ -172,7 +174,7 @@ function destroy (fileordir, notify) {
 }
 
 function checkSourceIgnored(source, opts, notify) {
-  var relativeSourcePath = source.replace(opts.mainSourcePath, "").replace(/^[\///]/, "");
+  var relativeSourcePath = source.replace(opts.mainSourcePath, "").replace(LEADING_SLASH_REGEXP, "");
   if (!isEmpty(relativeSourcePath) && opts.ig.ignores(relativeSourcePath)) {
     notify("exclude-source", source);
     return true;
@@ -180,7 +182,7 @@ function checkSourceIgnored(source, opts, notify) {
 }
 
 function checkTargetIgnored(target, opts, notify) {
-  var relativeTargetPath = target.replace(opts.mainTargetPath, "").replace(/^[\///]/, "");
+  var relativeTargetPath = target.replace(opts.mainTargetPath, "").replace(LEADING_SLASH_REGEXP, "");
   if (!isEmpty(relativeTargetPath) && opts.ig.ignores(relativeTargetPath)) {
     notify("exclude-target", target);
     return true;
